@@ -17,6 +17,6 @@
 2. Get DID Document `/getDIDDoc/:did`:
     - GET request with did as query param
 	- Returns object with context, did, and public key
-2. Get Key Pair `/keyPait`:
+2. Get Key Pair `/keyPair`:
     - GET request
     - Returns object with ethereum address, private key, and public key
