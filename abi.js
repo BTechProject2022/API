@@ -1,6 +1,19 @@
 require('dotenv').config();
 const Web3 = require('web3');
-const didContractAbi = [
+const contractAbi = [
+	{
+		anonymous: false,
+		inputs: [
+			{
+				indexed: false,
+				internalType: 'string',
+				name: 'did',
+				type: 'string',
+			},
+		],
+		name: 'CreateCredSchema',
+		type: 'event',
+	},
 	{
 		anonymous: false,
 		inputs: [
@@ -12,6 +25,63 @@ const didContractAbi = [
 			},
 		],
 		name: 'CreateDidEvent',
+		type: 'event',
+	},
+	{
+		anonymous: false,
+		inputs: [
+			{
+				components: [
+					{
+						internalType: 'string[]',
+						name: 'context',
+						type: 'string[]',
+					},
+					{
+						internalType: 'string',
+						name: 'id',
+						type: 'string',
+					},
+					{
+						internalType: 'string',
+						name: 'title',
+						type: 'string',
+					},
+					{
+						internalType: 'string',
+						name: 'description',
+						type: 'string',
+					},
+					{
+						components: [
+							{
+								internalType: 'string',
+								name: 'key',
+								type: 'string',
+							},
+							{
+								internalType: 'string',
+								name: 'propType',
+								type: 'string',
+							},
+							{
+								internalType: 'string',
+								name: 'propFormat',
+								type: 'string',
+							},
+						],
+						internalType: 'struct CredentialSchema.Properties[]',
+						name: 'properties',
+						type: 'tuple[]',
+					},
+				],
+				indexed: false,
+				internalType: 'struct CredentialSchema.CredSchema',
+				name: 'credSchema',
+				type: 'tuple',
+			},
+		],
+		name: 'GetCredSchema',
 		type: 'event',
 	},
 	{
@@ -70,6 +140,62 @@ const didContractAbi = [
 		inputs: [
 			{
 				internalType: 'string',
+				name: 'issuerDid',
+				type: 'string',
+			},
+			{
+				internalType: 'string',
+				name: 'hash',
+				type: 'string',
+			},
+			{
+				internalType: 'string',
+				name: 'title',
+				type: 'string',
+			},
+			{
+				internalType: 'string',
+				name: 'description',
+				type: 'string',
+			},
+			{
+				components: [
+					{
+						internalType: 'string',
+						name: 'key',
+						type: 'string',
+					},
+					{
+						internalType: 'string',
+						name: 'propType',
+						type: 'string',
+					},
+					{
+						internalType: 'string',
+						name: 'propFormat',
+						type: 'string',
+					},
+				],
+				internalType: 'struct CredentialSchema.Properties[]',
+				name: 'properties',
+				type: 'tuple[]',
+			},
+		],
+		name: 'createCredSchema',
+		outputs: [
+			{
+				internalType: 'string',
+				name: '',
+				type: 'string',
+			},
+		],
+		stateMutability: 'nonpayable',
+		type: 'function',
+	},
+	{
+		inputs: [
+			{
+				internalType: 'string',
 				name: 'addr',
 				type: 'string',
 			},
@@ -88,6 +214,35 @@ const didContractAbi = [
 			},
 		],
 		stateMutability: 'nonpayable',
+		type: 'function',
+	},
+	{
+		inputs: [
+			{
+				internalType: 'string',
+				name: '',
+				type: 'string',
+			},
+		],
+		name: 'credSchemaStore',
+		outputs: [
+			{
+				internalType: 'string',
+				name: 'id',
+				type: 'string',
+			},
+			{
+				internalType: 'string',
+				name: 'title',
+				type: 'string',
+			},
+			{
+				internalType: 'string',
+				name: 'description',
+				type: 'string',
+			},
+		],
+		stateMutability: 'view',
 		type: 'function',
 	},
 	{
@@ -134,6 +289,69 @@ const didContractAbi = [
 			},
 		],
 		stateMutability: 'view',
+		type: 'function',
+	},
+	{
+		inputs: [
+			{
+				internalType: 'string',
+				name: 'did',
+				type: 'string',
+			},
+		],
+		name: 'getCredSchema',
+		outputs: [
+			{
+				components: [
+					{
+						internalType: 'string[]',
+						name: 'context',
+						type: 'string[]',
+					},
+					{
+						internalType: 'string',
+						name: 'id',
+						type: 'string',
+					},
+					{
+						internalType: 'string',
+						name: 'title',
+						type: 'string',
+					},
+					{
+						internalType: 'string',
+						name: 'description',
+						type: 'string',
+					},
+					{
+						components: [
+							{
+								internalType: 'string',
+								name: 'key',
+								type: 'string',
+							},
+							{
+								internalType: 'string',
+								name: 'propType',
+								type: 'string',
+							},
+							{
+								internalType: 'string',
+								name: 'propFormat',
+								type: 'string',
+							},
+						],
+						internalType: 'struct CredentialSchema.Properties[]',
+						name: 'properties',
+						type: 'tuple[]',
+					},
+				],
+				internalType: 'struct CredentialSchema.CredSchema',
+				name: '',
+				type: 'tuple',
+			},
+		],
+		stateMutability: 'nonpayable',
 		type: 'function',
 	},
 	{
@@ -201,9 +419,9 @@ web3.setProvider(
 	new web3.providers.WebsocketProvider(process.env.PROVIDER_URL)
 );
 
-const didContract = new web3.eth.Contract(
-	didContractAbi,
+const contract = new web3.eth.Contract(
+	contractAbi,
 	process.env.CONTRACT_ADDRESS
 );
 
-module.exports = { didContract, web3 };
+module.exports = { contract, web3 };
