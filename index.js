@@ -4,10 +4,12 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const { contract, web3 } = require('./abi');
 const { keccak256 } = require('ethereum-cryptography/keccak');
-const secp256k1 = require('ethereum-cryptography/secp256k1');
 const secp = require('@noble/secp256k1');
 const { bytesToHex } = require('ethereum-cryptography/utils');
 const objectHash = require('object-hash');
+const { create } = require('ipfs-http-client');
+
+const ipfs = create();
 
 const PUBLIC_ADDRESS = process.env.PUBLIC_ADDRESS;
 
@@ -81,21 +83,16 @@ app.get('/getSchema/:did', async (req, res) => {
 	const did = decodeURI(req.params.did);
 	try {
 		const credSchema = await contract.methods.getCredSchema(did).call();
-		const props = [];
-		for (let i = 0; i < credSchema[4].length; i++) {
-			const temp = {
-				key: credSchema[4][i][0],
-				propType: credSchema[4][i][1],
-				propFormat: credSchema[4][i][2],
-			};
-			props.push(temp);
+		const stream = ipfs.cat(credSchema[2]);
+		let data = '';
+		for await (const chunk of stream) {
+			data += chunk.toString();
 		}
+		const dataObj = JSON.parse(data);
 		res.status(200).json({
 			context: credSchema[0],
 			did: credSchema[1],
-			name: credSchema[2],
-			description: credSchema[3],
-			properties: props,
+			...dataObj,
 		});
 	} catch (err) {
 		console.log(err);
@@ -106,18 +103,11 @@ app.get('/getSchema/:did', async (req, res) => {
 app.post('/createSchema', async (req, res) => {
 	console.log(req.body);
 	const hash = objectHash(req.body);
-	const { issuerDID, name, description, properties } = req.body;
-	const props = [];
-	for (let i = 0; i < properties.length; i++) {
-		const temp = [];
-		temp[0] = properties[i].key;
-		temp[1] = properties[i].propType;
-		temp[2] = properties[i].propFormat;
-		props.push(temp);
-	}
+	const { issuerDID } = req.body;
 	try {
+		const result = await ipfs.add(JSON.stringify(req.body));
 		const did = await contract.methods
-			.createCredSchema(issuerDID, hash, name, description, props)
+			.createCredSchema(issuerDID, hash, result.path)
 			.send({ from: PUBLIC_ADDRESS, gas: '1000000' });
 		res.status(200).json({
 			did: did.events.CreateCredSchema.returnValues.did,

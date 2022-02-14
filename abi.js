@@ -44,35 +44,8 @@ const contractAbi = [
 					},
 					{
 						internalType: 'string',
-						name: 'title',
+						name: 'ipfsHash',
 						type: 'string',
-					},
-					{
-						internalType: 'string',
-						name: 'description',
-						type: 'string',
-					},
-					{
-						components: [
-							{
-								internalType: 'string',
-								name: 'key',
-								type: 'string',
-							},
-							{
-								internalType: 'string',
-								name: 'propType',
-								type: 'string',
-							},
-							{
-								internalType: 'string',
-								name: 'propFormat',
-								type: 'string',
-							},
-						],
-						internalType: 'struct CredentialSchema.Properties[]',
-						name: 'properties',
-						type: 'tuple[]',
 					},
 				],
 				indexed: false,
@@ -150,35 +123,8 @@ const contractAbi = [
 			},
 			{
 				internalType: 'string',
-				name: 'title',
+				name: 'ipfsHash',
 				type: 'string',
-			},
-			{
-				internalType: 'string',
-				name: 'description',
-				type: 'string',
-			},
-			{
-				components: [
-					{
-						internalType: 'string',
-						name: 'key',
-						type: 'string',
-					},
-					{
-						internalType: 'string',
-						name: 'propType',
-						type: 'string',
-					},
-					{
-						internalType: 'string',
-						name: 'propFormat',
-						type: 'string',
-					},
-				],
-				internalType: 'struct CredentialSchema.Properties[]',
-				name: 'properties',
-				type: 'tuple[]',
 			},
 		],
 		name: 'createCredSchema',
@@ -233,12 +179,7 @@ const contractAbi = [
 			},
 			{
 				internalType: 'string',
-				name: 'title',
-				type: 'string',
-			},
-			{
-				internalType: 'string',
-				name: 'description',
+				name: 'ipfsHash',
 				type: 'string',
 			},
 		],
@@ -315,35 +256,8 @@ const contractAbi = [
 					},
 					{
 						internalType: 'string',
-						name: 'title',
+						name: 'ipfsHash',
 						type: 'string',
-					},
-					{
-						internalType: 'string',
-						name: 'description',
-						type: 'string',
-					},
-					{
-						components: [
-							{
-								internalType: 'string',
-								name: 'key',
-								type: 'string',
-							},
-							{
-								internalType: 'string',
-								name: 'propType',
-								type: 'string',
-							},
-							{
-								internalType: 'string',
-								name: 'propFormat',
-								type: 'string',
-							},
-						],
-						internalType: 'struct CredentialSchema.Properties[]',
-						name: 'properties',
-						type: 'tuple[]',
 					},
 				],
 				internalType: 'struct CredentialSchema.CredSchema',
