@@ -20,6 +20,19 @@ const contractAbi = [
 			{
 				indexed: false,
 				internalType: 'string',
+				name: 'did',
+				type: 'string',
+			},
+		],
+		name: 'CreateCredential',
+		type: 'event',
+	},
+	{
+		anonymous: false,
+		inputs: [
+			{
+				indexed: false,
+				internalType: 'string',
 				name: 'id',
 				type: 'string',
 			},
@@ -55,6 +68,41 @@ const contractAbi = [
 			},
 		],
 		name: 'GetCredSchema',
+		type: 'event',
+	},
+	{
+		anonymous: false,
+		inputs: [
+			{
+				components: [
+					{
+						internalType: 'string',
+						name: 'id',
+						type: 'string',
+					},
+					{
+						internalType: 'string',
+						name: 'owner',
+						type: 'string',
+					},
+					{
+						internalType: 'string',
+						name: 'issuer',
+						type: 'string',
+					},
+					{
+						internalType: 'string',
+						name: 'ipfsHash',
+						type: 'string',
+					},
+				],
+				indexed: false,
+				internalType: 'struct CredContract.Credential',
+				name: 'credential',
+				type: 'tuple',
+			},
+		],
+		name: 'GetCredential',
 		type: 'event',
 	},
 	{
@@ -128,6 +176,40 @@ const contractAbi = [
 			},
 		],
 		name: 'createCredSchema',
+		outputs: [
+			{
+				internalType: 'string',
+				name: '',
+				type: 'string',
+			},
+		],
+		stateMutability: 'nonpayable',
+		type: 'function',
+	},
+	{
+		inputs: [
+			{
+				internalType: 'string',
+				name: 'ownerDID',
+				type: 'string',
+			},
+			{
+				internalType: 'string',
+				name: 'issuerDID',
+				type: 'string',
+			},
+			{
+				internalType: 'string',
+				name: 'hash',
+				type: 'string',
+			},
+			{
+				internalType: 'string',
+				name: 'ipfsHash',
+				type: 'string',
+			},
+		],
+		name: 'createCredential',
 		outputs: [
 			{
 				internalType: 'string',
@@ -276,6 +358,47 @@ const contractAbi = [
 				type: 'string',
 			},
 		],
+		name: 'getCredential',
+		outputs: [
+			{
+				components: [
+					{
+						internalType: 'string',
+						name: 'id',
+						type: 'string',
+					},
+					{
+						internalType: 'string',
+						name: 'owner',
+						type: 'string',
+					},
+					{
+						internalType: 'string',
+						name: 'issuer',
+						type: 'string',
+					},
+					{
+						internalType: 'string',
+						name: 'ipfsHash',
+						type: 'string',
+					},
+				],
+				internalType: 'struct CredContract.Credential',
+				name: '',
+				type: 'tuple',
+			},
+		],
+		stateMutability: 'nonpayable',
+		type: 'function',
+	},
+	{
+		inputs: [
+			{
+				internalType: 'string',
+				name: 'did',
+				type: 'string',
+			},
+		],
 		name: 'getDid',
 		outputs: [
 			{
@@ -338,4 +461,4 @@ const contract = new web3.eth.Contract(
 	process.env.CONTRACT_ADDRESS
 );
 
-module.exports = { contract, web3 };
+module.exports = { contract };

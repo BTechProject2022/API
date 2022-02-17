@@ -2,7 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const { contract, web3 } = require('./abi');
+const { contract } = require('./abi');
 const { keccak256 } = require('ethereum-cryptography/keccak');
 const secp = require('@noble/secp256k1');
 const { bytesToHex } = require('ethereum-cryptography/utils');
@@ -17,6 +17,18 @@ const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cors());
+
+const verifySig = async (sign, hash, did) => {
+	try {
+		const didDoc = await contract.methods.getDid(did).call();
+		const publicKey = didDoc[2].publicKey;
+		const isValid = secp.verify(sign, hash, publicKey);
+		return isValid;
+	} catch (err) {
+		console.log(err);
+		return err;
+	}
+};
 
 // Key pair API
 app.get('/keyPair', async (req, res) => {
@@ -39,6 +51,15 @@ app.get('/keyPair', async (req, res) => {
 		console.log(err);
 		res.status(500).json({ error: err });
 	}
+});
+
+app.post('/sign', async (req, res) => {
+	console.log(req.body);
+	const signHash = await secp.sign(req.body.hash, req.body.privateKey, {
+		canonical: true,
+	});
+	const sign = secp.Signature.fromDER(signHash);
+	res.status(200).json({ sign: sign.toCompactHex() });
 });
 
 // DID APIs
@@ -111,6 +132,54 @@ app.post('/createSchema', async (req, res) => {
 			.send({ from: PUBLIC_ADDRESS, gas: '1000000' });
 		res.status(200).json({
 			did: did.events.CreateCredSchema.returnValues.did,
+		});
+	} catch (err) {
+		console.log(err);
+		res.status(500).json({ error: err });
+	}
+});
+
+app.post('/getCredential', async (req, res) => {
+	const { credDID, ownerDID, hash, sign } = req.body;
+	try {
+		const isValid = await verifySig(sign, hash, ownerDID);
+		if (!isValid) {
+			res.status(403).json({ mssg: 'Invalid signature' });
+		}
+		const credential = await contract.methods.getCredential(credDID).call();
+		const stream = ipfs.cat(credential[3]);
+		let data = '';
+		for await (const chunk of stream) {
+			data += chunk.toString();
+		}
+		const dataObj = JSON.parse(data);
+		res.status(200).json({
+			did: credential[0],
+			...dataObj,
+		});
+	} catch (err) {
+		console.log(err);
+		res.status(500).json({ error: err });
+	}
+});
+
+app.post('/addCredential', async (req, res) => {
+	console.log(req.body);
+	const hash = objectHash(req.body);
+	const { issuerDID, ownerDID, proof } = req.body;
+	try {
+		const isValid = await verifySig(proof.sign, proof.hash, issuerDID);
+		if (!isValid) {
+			res.status(403).json({ mssg: 'Invalid signature' });
+			return;
+		}
+		const result = await ipfs.add(JSON.stringify(req.body));
+		console.log(issuerDID, ownerDID);
+		const did = await contract.methods
+			.createCredential(ownerDID, issuerDID, hash, result.path)
+			.send({ from: PUBLIC_ADDRESS, gas: '1000000' });
+		res.status(200).json({
+			did: did.events.CreateCredential.returnValues.did,
 		});
 	} catch (err) {
 		console.log(err);
