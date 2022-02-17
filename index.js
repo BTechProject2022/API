@@ -145,6 +145,7 @@ app.post('/getCredential', async (req, res) => {
 		const isValid = await verifySig(sign, hash, ownerDID);
 		if (!isValid) {
 			res.status(403).json({ mssg: 'Invalid signature' });
+			return;
 		}
 		const credential = await contract.methods.getCredential(credDID).call();
 		const stream = ipfs.cat(credential[3]);
@@ -153,6 +154,10 @@ app.post('/getCredential', async (req, res) => {
 			data += chunk.toString();
 		}
 		const dataObj = JSON.parse(data);
+		if (dataObj.ownerDID != ownerDID) {
+			res.status(403).json({ mssg: 'Not the owner of the credential' });
+			return;
+		}
 		res.status(200).json({
 			did: credential[0],
 			...dataObj,
