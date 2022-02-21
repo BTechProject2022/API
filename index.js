@@ -139,15 +139,69 @@ app.post('/createSchema', async (req, res) => {
 	}
 });
 
-app.post('/getCredential', async (req, res) => {
-	const { credDID, ownerDID, hash, sign } = req.body;
+app.post('/revokeAccess', async (req, res) => {
+	const { credDID, ownerDID, hash, sign, receiverDID } = req.body;
 	try {
 		const isValid = await verifySig(sign, hash, ownerDID);
 		if (!isValid) {
 			res.status(403).json({ mssg: 'Invalid signature' });
 			return;
 		}
-		const credential = await contract.methods.getCredential(credDID).call();
+		const mssg = await contract.methods
+			.revokeAccess(ownerDID, credDID, receiverDID)
+			.send({
+				from: PUBLIC_ADDRESS,
+				gas: '1000000',
+			});
+		res.status(200).json({
+			mssg: mssg.events.RevokeAccess.returnValues.mssg,
+		});
+	} catch (err) {
+		console.log(err);
+		res.status(500).json({ error: err });
+	}
+});
+
+app.get('/getCredential', async (req, res) => {
+	const credDID = req.query.credDID;
+	const receiverDID = req.query.did;
+	try {
+		const credential = await contract.methods
+			.getCredential(credDID, receiverDID)
+			.call();
+		console.log(credential);
+		const stream = ipfs.cat(credential[3]);
+		let data = '';
+		for await (const chunk of stream) {
+			data += chunk.toString();
+		}
+		const dataObj = JSON.parse(data);
+		res.status(200).json({
+			did: credential[0],
+			...dataObj,
+		});
+	} catch (error) {
+		console.log(error);
+		res.status(500).json({ error: error });
+	}
+});
+
+app.post('/getCredential', async (req, res) => {
+	const { credDID, ownerDID, hash, sign, receiverDID } = req.body;
+	try {
+		const isValid = await verifySig(sign, hash, ownerDID);
+		if (!isValid) {
+			res.status(403).json({ mssg: 'Invalid signature' });
+			return;
+		}
+		console.log(ownerDID);
+		await contract.methods.giveAccess(ownerDID, credDID, receiverDID).send({
+			from: PUBLIC_ADDRESS,
+			gas: '1000000',
+		});
+		const credential = await contract.methods
+			.getCredential(credDID, receiverDID)
+			.call();
 		const stream = ipfs.cat(credential[3]);
 		let data = '';
 		for await (const chunk of stream) {

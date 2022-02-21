@@ -158,6 +158,45 @@ const contractAbi = [
 		type: 'event',
 	},
 	{
+		anonymous: false,
+		inputs: [
+			{
+				indexed: false,
+				internalType: 'string',
+				name: 'mssg',
+				type: 'string',
+			},
+		],
+		name: 'GiveAccess',
+		type: 'event',
+	},
+	{
+		anonymous: false,
+		inputs: [
+			{
+				indexed: false,
+				internalType: 'string',
+				name: 'mssg',
+				type: 'string',
+			},
+		],
+		name: 'RevokeAccess',
+		type: 'event',
+	},
+	{
+		anonymous: false,
+		inputs: [
+			{
+				indexed: false,
+				internalType: 'string',
+				name: 'mssg',
+				type: 'string',
+			},
+		],
+		name: 'SendMessage',
+		type: 'event',
+	},
+	{
 		inputs: [
 			{
 				internalType: 'string',
@@ -357,6 +396,11 @@ const contractAbi = [
 				name: 'did',
 				type: 'string',
 			},
+			{
+				internalType: 'string',
+				name: 'receiverDID',
+				type: 'string',
+			},
 		],
 		name: 'getCredential',
 		outputs: [
@@ -446,6 +490,52 @@ const contractAbi = [
 				type: 'tuple',
 			},
 		],
+		stateMutability: 'nonpayable',
+		type: 'function',
+	},
+	{
+		inputs: [
+			{
+				internalType: 'string',
+				name: 'ownerDID',
+				type: 'string',
+			},
+			{
+				internalType: 'string',
+				name: 'credDID',
+				type: 'string',
+			},
+			{
+				internalType: 'string',
+				name: 'receiverDID',
+				type: 'string',
+			},
+		],
+		name: 'giveAccess',
+		outputs: [],
+		stateMutability: 'nonpayable',
+		type: 'function',
+	},
+	{
+		inputs: [
+			{
+				internalType: 'string',
+				name: 'ownerDID',
+				type: 'string',
+			},
+			{
+				internalType: 'string',
+				name: 'credDID',
+				type: 'string',
+			},
+			{
+				internalType: 'string',
+				name: 'receiverDID',
+				type: 'string',
+			},
+		],
+		name: 'revokeAccess',
+		outputs: [],
 		stateMutability: 'nonpayable',
 		type: 'function',
 	},
