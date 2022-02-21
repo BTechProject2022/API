@@ -34,6 +34,15 @@
     - proof object consists of hash and the signed value of the hash
     - If the sign is valid then returns did of the newly created Credential
 8. Get Credential `/getCredential`:
-    - POST request with credDID, ownerDID, hash, and signed value of the hash in request body
+    - POST request with credDID, ownerDID, receiverDID, hash, and signed value of the hash in request body
+    - Gives access to the receiver of the credential only if the owner is the owner of the Credential
     - If the sign is valid then Credential is returned
-    - TODO: If access control is added then did of the receiver will also be needed but not for now.
+9. Get Credential `/getCredential`:
+    - GET request with `req.query.credDID` and `req.query.did` which maps to credential DID and receiver DID respectively
+    - Returns DID to the receiver if and only if the receiver has access
+    - Access to the receiver can be acquired by `POST /getCredential` request which contains ownerDID, hash, and signed value of hash to verify user
+    - Returns Credential
+10. Revoke Access `/revokeAccess`:
+    - POST request with credDID, ownerDID, receiverDID, hash, and signed value of the hash in request body
+    - Revokes access of the receiverDID if the sign is valid and the owner of the credential is ownerDID
+    - Returns a helpful message
