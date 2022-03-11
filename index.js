@@ -165,7 +165,14 @@ app.post('/revokeAccess', async (req, res) => {
 app.get('/getCredential', async (req, res) => {
 	const credDID = req.query.credDID;
 	const receiverDID = req.query.did;
+	const hash = req.query.hash;
+	const sign = req.query.sign;
 	try {
+		const isValid = await verifySig(sign, hash, receiverDID);
+		if (!isValid) {
+			res.status(403).json({ mssg: 'Invalid signature' });
+			return;
+		}
 		const credential = await contract.methods
 			.getCredential(credDID, receiverDID)
 			.call();

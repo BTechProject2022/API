@@ -38,9 +38,10 @@
     - Gives access to the receiver of the credential only if the owner is the owner of the Credential
     - If the sign is valid then Credential is returned
 9. Get Credential `/getCredential`:
-    - GET request with `req.query.credDID` and `req.query.did` which maps to credential DID and receiver DID respectively
+    - GET request with `req.query.credDID`, `req.query.did`, `req.query.hash`, and `req.query.sign` which maps to credential DID, receiver DID, unique hash, and sign of the hash using receiver's private key respectively
     - Returns DID to the receiver if and only if the receiver has access
     - Access to the receiver can be acquired by `POST /getCredential` request which contains ownerDID, hash, and signed value of hash to verify user
+    - (New) Added hash and sign part to this endpoint so as someone else cannot mimic the receiver by sending receiver's DID.
     - Returns Credential
 10. Revoke Access `/revokeAccess`:
     - POST request with credDID, ownerDID, receiverDID, hash, and signed value of the hash in request body
