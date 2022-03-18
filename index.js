@@ -253,6 +253,6 @@ app.post('/addCredential', async (req, res) => {
 	}
 });
 
-app.listen(8080, () => {
-	console.log('Server started on localhost:8080');
+app.listen(8080, process.env.IP, () => {
+	console.log(`Server started on ${process.env.IP}:8080`);
 });
