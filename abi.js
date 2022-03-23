@@ -121,6 +121,11 @@ const contractAbi = [
 						type: 'string',
 					},
 					{
+						internalType: 'string',
+						name: 'name',
+						type: 'string',
+					},
+					{
 						components: [
 							{
 								internalType: 'string',
@@ -271,6 +276,11 @@ const contractAbi = [
 				name: 'pubKey',
 				type: 'string',
 			},
+			{
+				internalType: 'string',
+				name: 'name',
+				type: 'string',
+			},
 		],
 		name: 'createDID',
 		outputs: [
@@ -320,6 +330,11 @@ const contractAbi = [
 			{
 				internalType: 'string',
 				name: 'id',
+				type: 'string',
+			},
+			{
+				internalType: 'string',
+				name: 'name',
 				type: 'string',
 			},
 			{
@@ -455,6 +470,11 @@ const contractAbi = [
 					{
 						internalType: 'string',
 						name: 'id',
+						type: 'string',
+					},
+					{
+						internalType: 'string',
+						name: 'name',
 						type: 'string',
 					},
 					{

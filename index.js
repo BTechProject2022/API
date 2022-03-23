@@ -69,12 +69,17 @@ app.get('/getDIDDoc/:did', async (req, res) => {
 		const didDoc = await contract.methods.getDid(did).call();
 		console.log(didDoc);
 		const key = {
-			id: didDoc[2].id,
-			owner: didDoc[2].owner,
-			methodType: didDoc[2].methodType,
-			publicKey: didDoc[2].publicKey,
+			id: didDoc[3].id,
+			owner: didDoc[3].owner,
+			methodType: didDoc[3].methodType,
+			publicKey: didDoc[3].publicKey,
 		};
-		res.status(200).json({ context: didDoc[0], did: didDoc[1], key: key });
+		res.status(200).json({
+			context: didDoc[0],
+			did: didDoc[1],
+			name: didDoc[2],
+			key: key,
+		});
 	} catch (err) {
 		console.log(err);
 		res.status(500).json({ error: err });
@@ -83,13 +88,14 @@ app.get('/getDIDDoc/:did', async (req, res) => {
 
 app.post('/createDID', async (req, res) => {
 	console.log(req.body);
-	const address = req.body.address;
-	const publicKey = req.body.publicKey;
+	const { address, publicKey, name } = req.body;
 	try {
-		const did = await contract.methods.createDID(address, publicKey).send({
-			from: PUBLIC_ADDRESS,
-			gas: '1000000',
-		});
+		const did = await contract.methods
+			.createDID(address, publicKey, name)
+			.send({
+				from: PUBLIC_ADDRESS,
+				gas: '1000000',
+			});
 		res.status(200).json({
 			did: did.events.CreateDidEvent.returnValues.id,
 		});
