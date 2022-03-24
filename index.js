@@ -21,7 +21,7 @@ app.use(cors());
 const verifySig = async (sign, hash, did) => {
 	try {
 		const didDoc = await contract.methods.getDid(did).call();
-		const publicKey = didDoc[2].publicKey;
+		const publicKey = didDoc[3].publicKey;
 		const isValid = secp.verify(sign, hash, publicKey);
 		return isValid;
 	} catch (err) {
@@ -79,6 +79,19 @@ app.get('/getDIDDoc/:did', async (req, res) => {
 			did: didDoc[1],
 			name: didDoc[2],
 			key: key,
+		});
+	} catch (err) {
+		console.log(err);
+		res.status(500).json({ error: err });
+	}
+});
+
+app.get('/getName/:did', async (req, res) => {
+	const did = decodeURI(req.params.did);
+	try {
+		const didDoc = await contract.methods.getDid(did).call();
+		res.status(200).json({
+			name: didDoc[2],
 		});
 	} catch (err) {
 		console.log(err);
