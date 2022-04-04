@@ -66,3 +66,10 @@
 11. Get name `/getName/:did`:
     - GET request with did as query param
     - Returns object with name property
+12. Export Account `/exportAccount`:
+    - POST request with did and data in request body
+    - Adds the encrypted data to IPFS and creates mapping between did and returned hash
+    - Does ***not*** return the IPFS hash, just returns a success message.
+13. Import Account `/importAccount/:did`:
+    - GET request with did as query param
+    - Returns the encrypted data stored in IPFS

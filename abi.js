@@ -152,6 +152,11 @@ const contractAbi = [
 						name: 'publicKey',
 						type: 'tuple',
 					},
+					{
+						internalType: 'string',
+						name: 'recovery',
+						type: 'string',
+					},
 				],
 				indexed: false,
 				internalType: 'struct DIDContract.DIDDocument',
@@ -364,6 +369,11 @@ const contractAbi = [
 				name: 'publicKey',
 				type: 'tuple',
 			},
+			{
+				internalType: 'string',
+				name: 'recovery',
+				type: 'string',
+			},
 		],
 		stateMutability: 'view',
 		type: 'function',
@@ -504,6 +514,11 @@ const contractAbi = [
 						name: 'publicKey',
 						type: 'tuple',
 					},
+					{
+						internalType: 'string',
+						name: 'recovery',
+						type: 'string',
+					},
 				],
 				internalType: 'struct DIDContract.DIDDocument',
 				name: '',
@@ -511,6 +526,25 @@ const contractAbi = [
 			},
 		],
 		stateMutability: 'nonpayable',
+		type: 'function',
+	},
+	{
+		inputs: [
+			{
+				internalType: 'string',
+				name: 'did',
+				type: 'string',
+			},
+		],
+		name: 'getRecovery',
+		outputs: [
+			{
+				internalType: 'string',
+				name: '',
+				type: 'string',
+			},
+		],
+		stateMutability: 'view',
 		type: 'function',
 	},
 	{
@@ -555,6 +589,24 @@ const contractAbi = [
 			},
 		],
 		name: 'revokeAccess',
+		outputs: [],
+		stateMutability: 'nonpayable',
+		type: 'function',
+	},
+	{
+		inputs: [
+			{
+				internalType: 'string',
+				name: 'did',
+				type: 'string',
+			},
+			{
+				internalType: 'string',
+				name: 'recovery',
+				type: 'string',
+			},
+		],
+		name: 'setRecovery',
 		outputs: [],
 		stateMutability: 'nonpayable',
 		type: 'function',

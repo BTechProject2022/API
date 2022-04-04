@@ -8,8 +8,10 @@ const secp = require('@noble/secp256k1');
 const { bytesToHex } = require('ethereum-cryptography/utils');
 const objectHash = require('object-hash');
 const { create } = require('ipfs-http-client');
+const multer = require('multer');
 
 const ipfs = create();
+const upload = multer();
 
 const PUBLIC_ADDRESS = process.env.PUBLIC_ADDRESS;
 
@@ -99,6 +101,44 @@ app.get('/getName/:did', async (req, res) => {
 	}
 });
 
+app.get('/importAccount/:did', async (req, res) => {
+	const did = decodeURI(req.params.did);
+	try {
+		const recoveryHash = await contract.methods.getRecovery(did).call();
+		console.log(recoveryHash);
+		const stream = ipfs.cat(recoveryHash);
+		let data = '';
+		for await (const chunk of stream) {
+			data += chunk.toString();
+		}
+		const dataObj = JSON.parse(data);
+		res.status(200).json({
+			data: dataObj,
+		});
+	} catch (err) {
+		console.log(err);
+		res.status(500).json({ error: err });
+	}
+});
+
+app.post('/exportAccount', async (req, res) => {
+	console.log(req.body);
+	const { did, data } = req.body;
+	try {
+		const result = await ipfs.add(JSON.stringify(data));
+		await contract.methods.setRecovery(did, result.path).send({
+			from: PUBLIC_ADDRESS,
+			gas: '1000000',
+		});
+		res.status(200).json({
+			mssg: 'Recovery hash set',
+		});
+	} catch (err) {
+		console.log(err);
+		res.status(500).json({ error: err });
+	}
+});
+
 app.post('/createDID', async (req, res) => {
 	console.log(req.body);
 	const { address, publicKey, name } = req.body;
@@ -158,6 +198,7 @@ app.post('/createSchema', async (req, res) => {
 	}
 });
 
+// Credential APIs
 app.post('/revokeAccess', async (req, res) => {
 	const { credDID, ownerDID, hash, sign, receiverDID } = req.body;
 	try {
